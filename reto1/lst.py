@@ -1,9 +1,11 @@
 import pathlib
+import sys
+import mimetypes
+
 text_extensions = {'.txt', '.csv', '.log', '.xml', '.json', '.html'}  # Add more text file extensions as needed
-def main():
+def main(carpeta):    
     # Se obtiene carpeta desde el usuario
-    ruta_str = input("Escribe la carpeta ")
-    ruta = pathlib.Path(ruta_str)
+    ruta = pathlib.Path(carpeta)
     
     # Se obtiene la lista de archivos a partir de ruta
     archivos = obtener_archivos_texto(ruta)  # Se asume que existirá una función que resolverá la tarea
@@ -29,21 +31,27 @@ def obtener_archivos_texto(ruta):
             archivos = archivos + lista_archivos_subruta  # Lo concatemos a la lista de archivos[]
     return archivos 
 
-def es_archivo_texto(name):
-    return get_file_extension(str(name)).lower() in text_extensions
-
-def get_file_extension(filename):
-    # Find the last dot in the filename
-    last_dot_index = filename.rfind('.')
-    
-    if last_dot_index != -1:
-        # Extract and return the file extension
-        return filename[last_dot_index:].lower()
+def es_archivo_texto(file_path):
+    mime_type, encoding = mimetypes.guess_type(file_path)
+    if mime_type:
+        return mime_type.startswith('text/')
     else:
-        # If there is no dot in the filename, return an empty string
-        return ""
+        return False
+
         
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) != 2:
+
+        raise ValueError("You must provide exactly one argument i.e. python lst.py <directorio>")
+
+    else:
+
+        try:
+
+            arg1 = sys.argv[1]
+            main(arg1)
+
+        except Exception as e:
+            print(f"An error occurred: {e}")
 
 

@@ -1,17 +1,18 @@
 import pathlib
 import sys
+import mimetypes
 from colorama import Fore, Style  # Import colorama for colored text
-text_extensions = {'.txt', '.csv', '.log', '.xml', '.json', '.html'}  # Add more text file extensions as needed
-def main(palabra, carpeta, ):
+def main(palabra, carpeta):
     ruta = pathlib.Path(carpeta)
     
     # Se obtiene la lista de archivos a partir de ruta
-    print("La lista de archivos de texto es:")
+    
     archivos = obtener_archivos_texto(ruta, palabra)  # Se asume que existirá una función que resolverá la tarea
     
     # # Se imprime la lista
-    # for nom in archivos:
-    #     print(nom)
+    print("La lista de archivos de texto es:")
+    for nom in archivos:
+        print(nom)
         
 def obtener_archivos_texto(ruta, word):
     """ Obtiene la lista de archivos de ruta y regresa sólo los que son
@@ -22,26 +23,23 @@ def obtener_archivos_texto(ruta, word):
             ## Complementa con un if y una función para determinar si el archivo es de
             ## texto entonces lo agregamos a la lista, si no, no hacemos nada y pasamos
             ## al siguiente
-            if es_archivo_texto(item) and search_word_in_file(item, word):
-                archivos.append(item)
+            if es_archivo_texto(item):
+                result = search_word_in_file(item, word)
+                if (result != False):
+                    archivos.append(result)
+                
         else:  # Si el item no es un archivo entonces es una carpeta y otenemos la lista de arcivos
             lista_archivos_subruta = obtener_archivos_texto(item, word)  # <-ruta
             archivos = archivos + lista_archivos_subruta  # Lo concatemos a la lista de archivos[]
     return archivos 
 
-def es_archivo_texto(name):
-    return get_file_extension(str(name)).lower() in text_extensions
-
-def get_file_extension(filename):
-    # Find the last dot in the filename
-    last_dot_index = filename.rfind('.')
-    
-    if last_dot_index != -1:
-        # Extract and return the file extension
-        return filename[last_dot_index:].lower()
+def es_archivo_texto(file_path):
+    mime_type, encoding = mimetypes.guess_type(file_path)
+    if mime_type:
+        return mime_type.startswith('text/')
     else:
-        # If there is no dot in the filename, return an empty string
-        return ""
+        return False
+
 def search_word_in_file(filename, word):
     try:
         with open(filename, 'r', encoding='utf-8') as file:
@@ -49,18 +47,29 @@ def search_word_in_file(filename, word):
             for line_number, line in enumerate(lines, 1):
                 if word in line:
                     line = line.replace(word, f'\033[91m{word}\033[0m')  # Highlight word in red
-                    print(f'{filename} (Line {line_number}): {line}')
-                    # str = f'{filename} (Line {line_number}): {line}'
-                    return True
+                    #print(f'{filename} (Line {line_number}): {line}')
+                    str = f'{filename} (Line {line_number}): {line}'
+                    return str
     except FileNotFoundError:
         pass  # File not found, skip
     return False
         
 if __name__ == "__main__":
-    arg1 = sys.argv[1]
-    arg2 = sys.argv[2]
+    if len(sys.argv) != 3:
 
-    main(arg1, arg2)
+        raise ValueError("You must provide exactly 2 arguments i.e. python lst.py <palabra a buscar> <directorio>")
+
+    else:
+
+        try:
+            arg1 = sys.argv[1]
+            arg2 = sys.argv[2]
+
+            main(arg1, arg2)
+
+        except Exception as e:
+            print(f"An error occurred: {e}")
+    
     
 
 

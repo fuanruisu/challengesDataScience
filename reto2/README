@@ -1,1 +1,2 @@
 Hice una mejora a la solucion 1, ademas de imprimir el nombre del archivo en el cual se encuentra la palabra dada tambien se imprime la palabra en color rojo asi como la linea completa con su numero.
+Disclaimer: Necesitas instalar el modulo de colorama para que funcione este codigo
